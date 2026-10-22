@@ -6,9 +6,9 @@ course, as a running record of each exercise sheet across the semester.
 
 > **For readers (human or AI) new to this repo:** this is a university assignment
 > repository, not a production codebase. Each `assignmentN/` folder is one graded exercise
-> sheet, containing the sheet's PDF, the starter template provided by the course staff, and
-> my own implementation. Code is written to satisfy each sheet's constraints (only the
-> packages listed in the template, Python 3.12, OpenCV 5.0.0, NumPy 2.3.3, Linux).
+> sheet, containing the sheet's PDF and my implementation (written into the course's starter
+> template file). Code is written to satisfy each sheet's constraints (only the packages
+> listed in the template, Python 3.12, OpenCV 5.0.0, NumPy 2.3.3, Linux).
 
 ## About this repository
 
@@ -23,7 +23,7 @@ been implemented.
 
 | Sheet | Folder | Topic | Core CV Concepts | Status |
 |---|---|---|---|---|
-| 0 | [`assignment1/`](assignment1/) | Introduction to OpenCV | Image I/O & display, RGB→HSV color space, pixel-wise transforms (loop vs. vectorized), ROI patch extraction/placement, grayscale thresholding & masking, drawing primitives & borders | In progress |
+| 0 | [`assignment1/`](assignment1/) | Introduction to OpenCV | Image I/O & display, RGB→HSV color space, pixel-wise transforms (loop vs. vectorized, with timing comparison), ROI patch extraction/placement, grayscale thresholding & masking, `copyMakeBorder` + drawing primitives (circles, text) | ✅ Complete |
 
 <!--
 When adding a new assignment:
@@ -59,7 +59,7 @@ assignments/
 ├── requirements.txt        # pinned deps shared by all sheets
 ├── assignment1/            # Sheet 0 — Introduction to OpenCV
 │   ├── CV1_sheet_0.pdf      # original exercise sheet
-│   ├── Sheet00_template.py  # staff-provided starter template
+│   ├── Sheet00_template.py  # my solution (written into the staff-provided template)
 │   ├── bonn.jpeg             # sample image used by the exercises
 │   └── README                # group members for this sheet
 └── assignmentN/             # future sheets, added as the semester progresses
