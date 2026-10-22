@@ -1,3 +1,8 @@
-# Pinned to the exact versions required by MA-INF 2201 (python 3.12, opencv 5.0.0, numpy 2.3.3)
+# Shared across all assignment sheets. Pinned to Sheet 0's strict requirement
+# (python 3.12, opencv 5.0.0, numpy 2.3.3); later sheets add libs on top
+# (matplotlib, scikit-image) and generally only "recommend" versions rather
+# than requiring them, so 5.0.0 is kept as the single source of truth.
 numpy==2.3.3
 opencv-python==5.0.0.93
+matplotlib==3.11.2
+scikit-image==0.26.0

@@ -24,6 +24,7 @@ been implemented.
 | Sheet | Folder | Topic | Core CV Concepts | Status |
 |---|---|---|---|---|
 | 0 | [`assignment1/`](assignment1/) | Introduction to OpenCV | Image I/O & display, RGB→HSV color space, pixel-wise transforms (loop vs. vectorized, with timing comparison), ROI patch extraction/placement, grayscale thresholding & masking, `copyMakeBorder` + drawing primitives (circles, text) | ✅ Complete |
+| 1 | [`assignment2/`](assignment2/) | Denoising, Convolution Theory, Integral Images, Histogram Equalization | Image denoising (Gaussian/median/bilateral filters, from-scratch vs. `cv2`, PSNR-based parameter optimization), Gaussian convolution theory, integral images for fast region sums (complexity analysis), histogram/CDF computation & histogram equalization from scratch | In progress |
 
 <!--
 When adding a new assignment:
@@ -37,7 +38,13 @@ When adding a new assignment:
 
 - **Image fundamentals:** reading/writing images, color space conversions, pixel-level
   manipulation
-- **Performance:** vectorized NumPy operations vs. explicit pixel loops
+- **Performance:** vectorized NumPy operations vs. explicit pixel loops; integral images for
+  O(1) region-sum queries vs. O(n) direct summation
+- **Filtering & denoising:** Gaussian, median, and bilateral filters implemented from scratch
+  and compared against `cv2` built-ins, with PSNR-driven parameter optimization
+- **Convolution theory:** composability of Gaussian kernels, separable-filter cost analysis
+- **Histogram-based methods:** histogram/CDF estimation and histogram equalization implemented
+  from scratch, validated against `cv2.equalizeHist`
 
 *(This list grows as later sheets are added — see the table above for the authoritative,
 per-sheet breakdown.)*
@@ -45,10 +52,12 @@ per-sheet breakdown.)*
 ## Tech Stack
 
 - **Language:** Python 3.12
-- **Core libraries:** OpenCV 5.0.0, NumPy 2.3.3
+- **Core libraries:** OpenCV 5.0.0, NumPy 2.3.3, matplotlib, scikit-image
 - **Platform:** Linux
-- Each sheet restricts usage to only the packages listed in its own template — no
-  additional third-party libraries are used beyond what's permitted.
+- Each sheet restricts usage to only the packages listed in its own template. `requirements.txt`
+  is the union of everything used across sheets so far — an individual sheet may only use a
+  subset of it (e.g. Sheet 0 only needs OpenCV + NumPy; `scikit-image` is used solely for PSNR
+  in Sheet 1).
 
 ## Repository Structure
 
@@ -62,6 +71,13 @@ assignments/
 │   ├── Sheet00_template.py  # my solution (written into the staff-provided template)
 │   ├── bonn.jpeg             # sample image used by the exercises
 │   └── README                # group members for this sheet
+├── assignment2/            # Sheet 1 — Denoising, Convolution, Integral Images, Histograms
+│   ├── Sheet01.pdf          # original exercise sheet
+│   ├── q1_template.py       # Q1: denoising filters + PSNR optimization
+│   ├── q3_template.py       # Q3: integral images
+│   ├── q4_template.py       # Q4: histogram equalization
+│   ├── bonn.jpg, bonn_noisy.jpg, bonn_lowcontrast.png  # sample images
+│   └── (Q2 is theory-only — proof submitted as PDF per the sheet's instructions)
 └── assignmentN/             # future sheets, added as the semester progresses
 ```
 
@@ -75,16 +91,17 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-This installs the exact versions required by the course (`numpy==2.3.3`,
-`opencv-python==5.0.0.93`, matching OpenCV 5.0.0 / Python 3.12).
+This installs `numpy==2.3.3` and `opencv-python==5.0.0.93` (matching OpenCV 5.0.0 / Python
+3.12, Sheet 0's strict requirement) plus `matplotlib` and `scikit-image` for later sheets.
 
 ## Running the Code
 
 Each assignment folder is self-contained. With the venv above activated, from inside a given
-`assignmentN/` folder:
+`assignmentN/` folder, run the relevant script directly, e.g.:
 
 ```bash
-python SheetNN_<name>.py
+python Sheet00_template.py     # assignment1
+python q1_template.py          # assignment2, Question 1
 ```
 
 ## Academic Integrity
