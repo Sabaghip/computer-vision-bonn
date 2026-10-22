@@ -56,6 +56,7 @@ per-sheet breakdown.)*
 assignments/
 ├── README.md              # this file
 ├── .gitignore
+├── requirements.txt        # pinned deps shared by all sheets
 ├── assignment1/            # Sheet 0 — Introduction to OpenCV
 │   ├── CV1_sheet_0.pdf      # original exercise sheet
 │   ├── Sheet00_template.py  # staff-provided starter template
@@ -64,10 +65,23 @@ assignments/
 └── assignmentN/             # future sheets, added as the semester progresses
 ```
 
+## Setup
+
+A single virtual environment at the repo root is shared across all assignment sheets.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+This installs the exact versions required by the course (`numpy==2.3.3`,
+`opencv-python==5.0.0.93`, matching OpenCV 5.0.0 / Python 3.12).
+
 ## Running the Code
 
-Each assignment folder is self-contained. From inside a given `assignmentN/` folder, with
-the required packages installed (see Tech Stack above):
+Each assignment folder is self-contained. With the venv above activated, from inside a given
+`assignmentN/` folder:
 
 ```bash
 python SheetNN_<name>.py

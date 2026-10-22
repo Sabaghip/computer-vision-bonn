@@ -1,0 +1,3 @@
+# Pinned to the exact versions required by MA-INF 2201 (python 3.12, opencv 5.0.0, numpy 2.3.3)
+numpy==2.3.3
+opencv-python==5.0.0.93
