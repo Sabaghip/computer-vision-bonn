@@ -1,0 +1,35 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.mypy_cache/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+ENV/
+# Anaconda local env export (keep environment.yml itself if you add one)
+*.conda/
+
+# --- Editors / IDEs ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- OS cruft ---
+.DS_Store
+Thumbs.db
+
+# --- Claude Code local settings (not part of the coursework) ---
+.claude/settings.local.json
+
+# --- Large / generated artifacts you usually don't want to commit ---
+*.mp4
+*.avi
+*.mov
