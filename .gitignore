@@ -33,3 +33,12 @@ Thumbs.db
 *.mp4
 *.avi
 *.mov
+
+# --- LaTeX build artifacts (keep .tex source and the final .pdf) ---
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
