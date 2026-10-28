@@ -11,7 +11,7 @@ print("--- 0. Setup: Loading Image ---")
 TODO: Load the image 'bonn_lowcontrast.png' as a grayscale image (uint8, values 0-255)
 '''
 
-low_contrast_img = None  # Load 'bonn_lowcontrast.png' in grayscale
+low_contrast_img = cv2.imread('bonn_lowcontrast.png', cv2.IMREAD_GRAYSCALE)
 
 print(f"Image loaded successfully. Size: {low_contrast_img.shape}")
 print(f"Intensity range: [{low_contrast_img.min()}, {low_contrast_img.max()}]")
@@ -38,7 +38,11 @@ def compute_histogram(img):
     2. Count how many pixels have each gray value y
     3. Normalize by the total number of pixels so that the values sum to 1
     """
-    pass
+    p_f = np.zeros(256)
+    total = img.size
+    for y in range(256):
+        p_f[y] = np.sum(img == y) / total
+    return p_f
 
 
 def compute_cdf(p_f):
@@ -54,15 +58,18 @@ def compute_cdf(p_f):
     TODO:
     1. Accumulate the histogram values from gray value 0 up to y
     """
-    pass
+    return np.cumsum(p_f)
 
 
-p_f = None  # Call compute_histogram()
-F_f = None  # Call compute_cdf()
+p_f = compute_histogram(low_contrast_img)  # Call compute_histogram()
+F_f = compute_cdf(p_f)  # Call compute_cdf()
 
 # TODO: Plot the normalized histogram p_f(y) and the CDF F_f(y)
 #       (e.g., two subplots, x-axis: gray value 0-255)
-
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+axes[0].bar(range(256), p_f); axes[0].set_title("Normalized histogram p_f")
+axes[1].plot(F_f); axes[1].set_title("CDF F_f")
+plt.show()
 
 # ==============================================================================
 # 2. Histogram Equalization from Scratch (Part 4.2)
@@ -86,13 +93,21 @@ def equalize_histogram(img, F_f):
     2. Convert the LUT to uint8
     3. Apply the LUT to every pixel (use array indexing, no loops over pixels)
     """
-    pass
+    lut = np.round(255 * F_f).astype(np.uint8)
+    return lut[img]
 
-
-equalized_img = None  # Call equalize_histogram()
+equalized_img = equalize_histogram(low_contrast_img, F_f)  # Call equalize_histogram()
 
 # TODO: Display the original and the equalized image side by side
-
+plt.figure(figsize=(10, 5))
+plt.subplot(1, 2, 1); plt.imshow(low_contrast_img, cmap='gray', vmin=0, vmax=255); 
+plt.title("Original (low contrast)"); 
+plt.axis('off')
+plt.subplot(1, 2, 2); 
+plt.imshow(equalized_img, cmap='gray', vmin=0, vmax=255); 
+plt.title("Equalized"); plt.axis('off')
+plt.tight_layout()
+plt.show()
 
 # ==============================================================================
 # 3. Comparison with OpenCV (Part 4.3)
@@ -109,8 +124,8 @@ TODO:
    and print the maximum absolute difference again
 '''
 
-equalized_cv2 = None
-max_diff = None
+equalized_cv2 = cv2.equalizeHist(low_contrast_img)
+max_diff = np.max(np.abs(equalized_img.astype(int) - equalized_cv2.astype(int)))
 
 print(f"Max. absolute difference (own vs. cv2): {max_diff}")
 
@@ -128,11 +143,17 @@ def equalize_histogram_opencv_like(img):
     TODO:
     Modify the mapping from 4.2 so that the result is identical to cv2.equalizeHist
     """
-    pass
+    p_f = compute_histogram(img)
+    counts = p_f * img.size
+    cdf = np.cumsum(counts)
+    cdf_min = cdf[cdf > 0].min()
+    lut = np.round((cdf - cdf_min) / (img.size - cdf_min) * 255).astype(np.uint8)
+    lut = np.clip(lut, 0, 255)
+    return lut[img]
 
 
-equalized_adapted = None
-max_diff_adapted = None
+equalized_adapted = equalize_histogram_opencv_like(low_contrast_img)
+max_diff_adapted = np.max(np.abs(equalized_adapted.astype(int) - equalized_cv2.astype(int)))
 
 print(f"Max. absolute difference (adapted vs. cv2): {max_diff_adapted}")
 
@@ -149,7 +170,8 @@ TODO:
 3. Answer in your PDF: why is the histogram not flat?
 '''
 
-p_h = None
+p_h = compute_histogram(equalized_img)
+plt.bar(range(256), p_h); plt.title("Histogram after equalization"); plt.show()
 
 # TODO: Plot the histogram of the equalized image
 

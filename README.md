@@ -24,7 +24,7 @@ been implemented.
 | Sheet | Folder | Topic | Core CV Concepts | Status |
 |---|---|---|---|---|
 | 0 | [`assignment1/`](assignment1/) | Introduction to OpenCV | Image I/O & display, RGB→HSV color space, pixel-wise transforms (loop vs. vectorized, with timing comparison), ROI patch extraction/placement, grayscale thresholding & masking, `copyMakeBorder` + drawing primitives (circles, text) | ✅ Complete |
-| 1 | [`assignment2/`](assignment2/) | Denoising, Convolution Theory, Integral Images, Histogram Equalization | Image denoising (Gaussian/median/bilateral filters, from-scratch vs. `cv2`, PSNR-based parameter optimization), Gaussian convolution theory, integral images for fast region sums (complexity analysis), histogram/CDF computation & histogram equalization from scratch | In progress |
+| 1 | [`assignment2/`](assignment2/) | Denoising, Convolution Theory, Integral Images, Histogram Equalization | Image denoising (Gaussian/median/bilateral filters, from-scratch vs. `cv2`, PSNR-based parameter optimization), Gaussian convolution theory, integral images for fast region sums (complexity analysis), histogram/CDF computation & histogram equalization from scratch | ✅ Complete |
 
 <!--
 When adding a new assignment:
@@ -77,7 +77,8 @@ assignments/
 │   ├── q3_template.py       # Q3: integral images
 │   ├── q4_template.py       # Q4: histogram equalization
 │   ├── bonn.jpg, bonn_noisy.jpg, bonn_lowcontrast.png  # sample images
-│   └── (Q2 is theory-only — proof submitted as PDF per the sheet's instructions)
+│   ├── answers.tex          # Q2 proof + all discussion sections (LaTeX source)
+│   └── answers.pdf           # compiled written answers (Q2 proof, 1.4/3.4/4.3/4.4 discussion)
 └── assignmentN/             # future sheets, added as the semester progresses
 ```
 
@@ -101,7 +102,16 @@ Each assignment folder is self-contained. With the venv above activated, from in
 
 ```bash
 python Sheet00_template.py     # assignment1
-python q1_template.py          # assignment2, Question 1
+python q1_template.py          # assignment2, Question 1 (also q3_template.py, q4_template.py)
+```
+
+Sheets with theory/discussion questions (e.g. Sheet 1's Question 2 proof) are written up separately
+as LaTeX, compiled with a local TeX distribution (not part of the Python venv):
+
+```bash
+cd assignment2
+pdflatex answers.tex
+rm -f answers.aux answers.log answers.out   # drop build artifacts, keep .tex and .pdf
 ```
 
 ## Academic Integrity

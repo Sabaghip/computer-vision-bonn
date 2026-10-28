@@ -7,8 +7,8 @@
 \usepackage{parskip}
 
 \title{MA-INF 2201 Computer Vision WS26/27 \\ Exercise Sheet 1 --- Written Answers}
-\author{Mohamadhosein (Parsa) Sabaghi}
-\date{\today}
+\author{Mohamadhosein Sabaghi \and Sepehr Noey Kordkandi}
+\date{}
 
 \begin{document}
 \maketitle
@@ -148,6 +148,42 @@ dramatically visible for much larger regions or when many repeated queries
 amortize the $O(wh)$ build cost.
 
 % ==========================================================================
-% TODO: add Section 4 (Histogram Equalization) back once you're ready.
+\section{Histogram Equalization}
+
+\subsection{Comparison with OpenCV (Part 4.3)}
+
+Our initial implementation used the mapping $h(y) = \text{round}(255 \cdot
+F_f(y))$ directly on the normalized CDF, which gave a maximum absolute
+pixel difference of \textbf{25} compared to \texttt{cv2.equalizeHist}.
+OpenCV's \texttt{equalizeHist} instead subtracts the minimum non-zero
+cumulative count before normalizing:
+\[
+h(v) = \text{round}\!\left(\frac{\text{cdf}(v) - \text{cdf}_{\min}}{MN - \text{cdf}_{\min}} \cdot 255\right),
+\]
+where $\text{cdf}_{\min}$ is the smallest non-zero value of the
+\emph{unnormalized} cumulative histogram and $MN$ is the total number of
+pixels. This offset ensures the darkest intensity actually present in the
+image maps exactly to 0, which our naive formula does not guarantee ---
+this matters especially here since the low-contrast image only occupies
+the narrow intensity range $[110, 166]$, so the un-adjusted CDF starts far
+above 0 at the image's minimum intensity, shifting every mapped value
+upward. After adapting our implementation to use this $\text{cdf}_{\min}$-corrected
+formula, the maximum absolute difference to \texttt{cv2.equalizeHist}
+dropped to \textbf{0} --- an exact match.
+
+\subsection{Histogram after Equalization (Part 4.4)}
+
+The theoretical flat-histogram result assumes continuous intensities,
+where the CDF mapping can redistribute probability mass perfectly evenly.
+With only 256 discrete levels, many input pixels sharing the same gray
+value must map to the \emph{same} output value, and the rounding in
+$h(y) = \text{round}(255 \cdot F_f(y))$ can cause several input levels to
+collapse onto one output level while skipping others entirely. This effect
+is especially pronounced for this image: since the original intensities
+were confined to a narrow 57-level range ($[110,166]$) before equalization,
+only a limited number of distinct gray values exist to begin with, so the
+discrete mapping cannot produce the full smooth spread of 256 equally
+likely output levels --- the result is a histogram with spikes and gaps
+rather than a flat distribution.
 
 \end{document}
