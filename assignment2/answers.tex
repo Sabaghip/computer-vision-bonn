@@ -108,7 +108,46 @@ Single large filter ($w=25$) & $25^2 = 625$ & $2\cdot 25 = 50$ \\
 \textbf{Which is cheaper?} In both cases the single large filter is cheaper, but the gap is far more dramatic for the separable implementation ($50$ vs.\ $224$, a $\sim4.5\times$ difference) than for the full 2D kernel ($625$ vs.\ $784$, only $\sim1.25\times$). This is because for a full 2D kernel, repeating a small filter $n=(\sigma_{\text{target}}/\sigma_1)^2$ times costs $n\cdot w_{\text{small}}^2 \approx 36\,\sigma_{\text{target}}^2$, the same asymptotic order as a single large kernel's $w_{\text{large}}^2\approx 36\,\sigma_{\text{target}}^2$ cost --- so the two scale identically with $\sigma_{\text{target}}$, and only the rounding/$+1$ terms separate them. For a \emph{separable} kernel, however, a single pass costs only $2w\approx 12\,\sigma_{\text{target}}$ (linear in $\sigma_{\text{target}}$), while repeating the small separable filter still costs $n\cdot 2w_{\text{small}} \approx 12\,\sigma_{\text{target}}^2/\sigma_1$ (quadratic in $\sigma_{\text{target}}$, since $n$ itself grows quadratically). So whenever separable filtering is available, using one correctly-sized large filter is substantially cheaper than cascading many small ones --- the advantage of separability compounds with the size of the single large filter, but is largely wasted by repeating a tiny filter many times.
 
 % ==========================================================================
-% TODO: add Section 3 (Integral Images) back once you're ready.
+\section{Integral Images}
+
+\subsection{Computational Complexity (Part 3.4)}
+
+Theoretical time complexity:
+\begin{itemize}
+  \item Integral-image method: $O(1)$ per query (after an $O(wh)$ one-time
+        cost to build the integral image).
+  \item Direct summation method: $O(w \cdot h)$ per query, where $w,h$ are
+        the region's width and height ($71 \times 51 = 3621$ pixels for the
+        region used here).
+\end{itemize}
+
+Measured execution times (average over 100 iterations, region top-left
+$(10,10)$, bottom-right $(60,80)$):
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccc}
+\toprule
+Method & Avg.\ time per call & Complexity & Mean gray value \\
+\midrule
+Integral image & $0.85$~\textmu s & $O(1)$ & $209.80$ \\
+Direct summation & $7.93$~\textmu s & $O(w \cdot h)$ & $209.80$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Both methods agree exactly on the resulting mean gray value ($209.80$),
+confirming the integral image was constructed correctly. The measured
+speedup ($9.4\times$) is real but far smaller than the raw $O(1)$ vs.\
+$O(wh)$ complexity gap would suggest for a $3621$-pixel region: at this
+very small timescale (microseconds), constant overheads --- Python
+function-call overhead and NumPy's highly vectorized, SIMD-accelerated
+\texttt{.mean()} over a slice --- dominate the wall-clock time for both
+methods, so the asymptotic advantage of the integral image only becomes
+dramatically visible for much larger regions or when many repeated queries
+amortize the $O(wh)$ build cost.
+
+% ==========================================================================
 % TODO: add Section 4 (Histogram Equalization) back once you're ready.
 
 \end{document}

@@ -12,8 +12,8 @@ TODO: Load the image 'bonn.jpg' and convert it to grayscale
 '''
 
 # Load image and convert to grayscale
-original_img_color = None  # Load 'bonn.jpg'
-gray_img = None            # Convert to grayscale
+original_img_color = cv2.imread('bonn.jpg')
+gray_img = cv2.cvtColor(original_img_color, cv2.COLOR_BGR2GRAY)
 
 print(f"Image loaded successfully. Size: {gray_img.shape}")
 
@@ -39,11 +39,23 @@ def calculate_integral_image(img):
     2. Iterate through all pixels and compute integral values
     
         """
-    pass
+    h, w = img.shape
+    integral = np.zeros((h + 1, w + 1), dtype=np.float64)
+
+    for i in range(1, h + 1):
+        for j in range(1, w + 1):
+            integral[i, j] = (
+                img[i - 1, j - 1]
+                + integral[i - 1, j]
+                + integral[i, j - 1]
+                - integral[i - 1, j - 1]
+            )
+    return integral
+
 
 
 # Calculate integral image
-integral_img = None  # Call calculate_integral_image()
+integral_img = calculate_integral_image(gray_img)  # Call calculate_integral_image()
 
 print("Integral image calculated successfully.")
 print(f"Integral image size: {integral_img.shape}")
@@ -72,7 +84,11 @@ def mean_using_integral(integral, top_left, bottom_right):
     2. Adjust indices for integral image (remember it's 1-indexed)
     3. Return Sum / number_of_pixels
     """
-    pass
+    y1, x1 = top_left
+    y2, x2 = bottom_right
+    total = integral[y2+1, x2+1] - integral[y1, x2+1] - integral[y2+1, x1] + integral[y1, x1]
+    num_pixels = (y2 - y1 + 1) * (x2 - x1 + 1)
+    return total / num_pixels
 
 
 # Define region
@@ -80,7 +96,7 @@ top_left = (10, 10)
 bottom_right = (60, 80)
 
 # Calculate mean using integral image
-mean_integral = None  # Call mean_using_integral()
+mean_integral = mean_using_integral(integral_img, top_left, bottom_right)  # Call mean_using_integral()
 
 print(f"Region: Top-left {top_left}, Bottom-right {bottom_right}")
 print(f"Region size: {bottom_right[0] - top_left[0] + 1} x {bottom_right[1] - top_left[1] + 1} pixels")
@@ -110,11 +126,14 @@ def mean_by_direct_sum(img, top_left, bottom_right):
     2. Calculate and return the mean of all pixels in the region
     
       """
-    pass
+    y1, x1 = top_left
+    y2, x2 = bottom_right
+    region = img[y1:y2+1, x1:x2+1]
+    return region.mean()
 
 
 # Calculate mean using direct summation
-mean_direct = None  # Call mean_by_direct_sum()
+mean_direct = mean_by_direct_sum(gray_img, top_left, bottom_right)  # Call mean_by_direct_sum()
 
 print(f"Mean gray value (Direct Summation Method): {mean_direct:.2f}")
 
@@ -143,8 +162,18 @@ iterations = 100
 print(f"\nBenchmarking with {iterations} iterations...\n")
 
 # TODO: Implement benchmarking code here
-time_integral = None
-time_direct = None
+start = time.perf_counter()
+for _ in range(iterations):
+    mean_using_integral(integral_img, top_left, bottom_right)
+time_integral = (time.perf_counter() - start) / iterations
+
+start = time.perf_counter()
+for _ in range(iterations):
+    mean_by_direct_sum(gray_img, top_left, bottom_right)
+time_direct = (time.perf_counter() - start) / iterations
 
 # TODO: Display results 
 # TODO: Print theoretical complexity explanation
+print(f"Integral method: {time_integral*1e6:.2f} µs/call  (O(1))")
+print(f"Direct method:   {time_direct*1e6:.2f} µs/call  (O(w*h))")
+print(f"Speedup: {time_direct/time_integral:.1f}x")
