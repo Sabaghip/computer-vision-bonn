@@ -40,7 +40,74 @@ PSNR, since PSNR does not fully capture perceptual/structural quality.
 % the displayed images.
 
 % ==========================================================================
-% TODO: add Section 2 (Convolution of Gaussians) back once you're ready.
+\section{Convolution of Gaussians}
+
+\subsection{Convolution of Two 1D Gaussians (Part 2.1)}
+
+By definition of convolution,
+\[
+(g_{\sigma_1} * g_{\sigma_2})(x) = \int_{-\infty}^{\infty} g_{\sigma_1}(u)\, g_{\sigma_2}(x-u)\, du
+= \frac{1}{2\pi\sigma_1\sigma_2} \int_{-\infty}^{\infty} \exp\!\left(-\frac{u^2}{2\sigma_1^2} - \frac{(x-u)^2}{2\sigma_2^2}\right) du.
+\]
+
+Write $A = \dfrac{1}{2\sigma_1^2}$, $B = \dfrac{1}{2\sigma_2^2}$, so the exponent is
+$-Au^2 - B(x-u)^2 = -(A+B)u^2 + 2Bxu - Bx^2$.
+Completing the square in $u$:
+\[
+-(A+B)u^2 + 2Bxu - Bx^2 = -(A+B)\left(u - \frac{Bx}{A+B}\right)^2 - \frac{AB}{A+B}x^2.
+\]
+
+Substituting back and using the hint $\int_{-\infty}^{\infty} e^{-a(u-b)^2}\,du = \sqrt{\pi/a}$ with $a = A+B$:
+\[
+(g_{\sigma_1} * g_{\sigma_2})(x) = \frac{1}{2\pi\sigma_1\sigma_2}\, \sqrt{\frac{\pi}{A+B}}\; \exp\!\left(-\frac{AB}{A+B}x^2\right).
+\]
+
+Now simplify the two factors. Since $A+B = \dfrac{\sigma_1^2+\sigma_2^2}{2\sigma_1^2\sigma_2^2}$, writing $\sigma^2 := \sigma_1^2+\sigma_2^2$ gives
+\[
+\frac{AB}{A+B} = \frac{1}{2(\sigma_1^2+\sigma_2^2)} = \frac{1}{2\sigma^2},
+\qquad
+\sqrt{\frac{\pi}{A+B}} = \sqrt{2\pi}\,\frac{\sigma_1\sigma_2}{\sigma}.
+\]
+
+Substituting both back:
+\[
+(g_{\sigma_1} * g_{\sigma_2})(x) = \frac{1}{2\pi\sigma_1\sigma_2}\cdot \sqrt{2\pi}\,\frac{\sigma_1\sigma_2}{\sigma}\, \exp\!\left(-\frac{x^2}{2\sigma^2}\right)
+= \frac{1}{\sqrt{2\pi}\,\sigma}\exp\!\left(-\frac{x^2}{2\sigma^2}\right) = g_\sigma(x),
+\]
+with $\sigma = \sqrt{\sigma_1^2+\sigma_2^2}$, which is exactly $g_\sigma$. $\blacksquare$
+
+\textbf{Conclusion.} Setting $\sigma_1 = \sigma_2 = \sigma$ gives $(g_\sigma * g_\sigma)(x) = g_{\sigma\sqrt{2}}(x)$: convolving twice with a Gaussian of standard deviation $\sigma$ is identical to convolving once with a Gaussian of standard deviation $\sigma\sqrt{2}$, since both produce a Gaussian whose variance is the sum of the variances of the two convolved kernels ($\sigma^2+\sigma^2 = 2\sigma^2$).
+
+\subsection{Repeated Small Filter vs.\ One Large Filter (Part 2.2)}
+
+\textbf{Number of repetitions.} By the composition rule from Part 2.1, applying a Gaussian of standard deviation $\sigma_1$ $n$ times in a row yields an effective standard deviation $\sigma_{\text{eff}} = \sigma_1\sqrt{n}$ (variances add). With $\sigma_1 = 1$ and the target $\sigma_{\text{eff}} = 4$:
+\[
+4 = 1\cdot\sqrt{n} \;\Longrightarrow\; n = 16.
+\]
+So the $\sigma=1$ filter must be applied \textbf{16 times}.
+
+\textbf{Kernel sizes.} Using the rule of thumb half-width $\approx 3\sigma$, i.e.\ full kernel width $w = 6\sigma+1$:
+\[
+w_{\text{small}} = 6(1)+1 = 7, \qquad w_{\text{large}} = 6(4)+1 = 25.
+\]
+
+\textbf{Cost comparison (multiplications per pixel).}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+ & Full 2D kernel & Separable (1D $\times$ 1D) \\
+\midrule
+Repeated small filter ($n=16$ applications of $w=7$) & $16 \cdot 7^2 = 784$ & $16 \cdot (2\cdot 7) = 224$ \\
+Single large filter ($w=25$) & $25^2 = 625$ & $2\cdot 25 = 50$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Which is cheaper?} In both cases the single large filter is cheaper, but the gap is far more dramatic for the separable implementation ($50$ vs.\ $224$, a $\sim4.5\times$ difference) than for the full 2D kernel ($625$ vs.\ $784$, only $\sim1.25\times$). This is because for a full 2D kernel, repeating a small filter $n=(\sigma_{\text{target}}/\sigma_1)^2$ times costs $n\cdot w_{\text{small}}^2 \approx 36\,\sigma_{\text{target}}^2$, the same asymptotic order as a single large kernel's $w_{\text{large}}^2\approx 36\,\sigma_{\text{target}}^2$ cost --- so the two scale identically with $\sigma_{\text{target}}$, and only the rounding/$+1$ terms separate them. For a \emph{separable} kernel, however, a single pass costs only $2w\approx 12\,\sigma_{\text{target}}$ (linear in $\sigma_{\text{target}}$), while repeating the small separable filter still costs $n\cdot 2w_{\text{small}} \approx 12\,\sigma_{\text{target}}^2/\sigma_1$ (quadratic in $\sigma_{\text{target}}$, since $n$ itself grows quadratically). So whenever separable filtering is available, using one correctly-sized large filter is substantially cheaper than cascading many small ones --- the advantage of separability compounds with the size of the single large filter, but is largely wasted by repeating a tiny filter many times.
+
+% ==========================================================================
 % TODO: add Section 3 (Integral Images) back once you're ready.
 % TODO: add Section 4 (Histogram Equalization) back once you're ready.
 
