@@ -22,8 +22,58 @@ $\sum_{k=0}^{N-1}r^k=(1-r^N)/(1-r)$ for $r\neq 1$.
 
 \subsection*{Your proof}
 
-% TODO: Expand the squared magnitude of each Fourier coefficient.
-% TODO: Rearrange the sums and use orthogonality of complex exponentials.
-% TODO: Explain the orthogonality identity and obtain the result.
-    
+\textbf{Step 1: Write the left side using the inverse DFT.}
+Since $|f(x)|^2 = f(x)\overline{f(x)}$, substitute the inverse DFT
+$f(x) = \frac{1}{\sqrt{N}}\sum_{k=0}^{N-1} F(\omega_k) e^{i\omega_k x}$ into both
+$f(x)$ and its conjugate (using independent summation indices $k$ and $k'$ so the two
+sums can be kept apart):
+\[
+\sum_{x=0}^{N-1} |f(x)|^2
+= \sum_{x=0}^{N-1} f(x)\overline{f(x)}
+= \sum_{x=0}^{N-1} \left(\frac{1}{\sqrt{N}}\sum_{k=0}^{N-1} F(\omega_k) e^{i\omega_k x}\right)
+\overline{\left(\frac{1}{\sqrt{N}}\sum_{k'=0}^{N-1} F(\omega_{k'}) e^{i\omega_{k'} x}\right)}.
+\]
+
+\textbf{Step 2: Expand the conjugate and rearrange the sums.}
+Conjugating the second factor gives $\overline{F(\omega_{k'})}\,e^{-i\omega_{k'}x}$. Pulling
+the $\frac{1}{\sqrt{N}}\cdot\frac{1}{\sqrt{N}} = \frac{1}{N}$ factor out and swapping the
+(finite) sums over $x$, $k$, and $k'$ is valid since all sums are finite:
+\[
+\sum_{x=0}^{N-1} |f(x)|^2
+= \frac{1}{N}\sum_{k=0}^{N-1}\sum_{k'=0}^{N-1} F(\omega_k)\,\overline{F(\omega_{k'})}
+\underbrace{\sum_{x=0}^{N-1} e^{i(\omega_k-\omega_{k'})x}}_{=:S(k,k')}.
+\]
+
+\textbf{Step 3: Evaluate the orthogonality sum $S(k,k')$.}
+Let $r = e^{i(\omega_k-\omega_{k'})} = e^{i2\pi(k-k')/N}$, so $S(k,k') = \sum_{x=0}^{N-1} r^x$.
+
+\emph{Case $k=k'$:} then $r=1$, and the sum is just $N$ copies of $1$, so $S(k,k)=N$.
+
+\emph{Case $k\neq k'$:} then $k-k'$ is a nonzero integer with $|k-k'|<N$, so
+$\omega_k-\omega_{k'}=2\pi(k-k')/N$ is not a multiple of $2\pi$, hence $r\neq 1$ and the
+geometric series formula from the hint applies:
+\[
+S(k,k') = \frac{1-r^N}{1-r}.
+\]
+But $r^N = e^{i2\pi(k-k')} = 1$ because $k-k'$ is an integer, so the numerator vanishes and
+$S(k,k')=0$.
+
+Combining both cases gives the orthogonality identity
+\[
+S(k,k') = \sum_{x=0}^{N-1} e^{i(\omega_k-\omega_{k'})x} = N\,\delta_{k,k'}
+=\begin{cases} N, & k=k' \\ 0, & k\neq k', \end{cases}
+\]
+i.e.\ the discrete complex exponentials $e^{i\omega_k x}$ are orthogonal over one period.
+
+\textbf{Step 4: Substitute back and conclude.}
+Only the $k=k'$ terms of the double sum survive:
+\[
+\sum_{x=0}^{N-1} |f(x)|^2
+= \frac{1}{N}\sum_{k=0}^{N-1}\sum_{k'=0}^{N-1} F(\omega_k)\,\overline{F(\omega_{k'})}\, N\,\delta_{k,k'}
+= \sum_{k=0}^{N-1} F(\omega_k)\,\overline{F(\omega_k)}
+= \sum_{k=0}^{N-1} |F(\omega_k)|^2,
+\]
+which is exactly Parseval's theorem, $\sum_{x} |f(x)|^2 = \sum_{\omega} |F(\omega)|^2$.
+$\blacksquare$
+
 \end{document}
