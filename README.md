@@ -25,6 +25,7 @@ been implemented.
 |---|---|---|---|---|
 | 0 | [`assignment1/`](assignment1/) | Introduction to OpenCV | Image I/O & display, RGB→HSV color space, pixel-wise transforms (loop vs. vectorized, with timing comparison), ROI patch extraction/placement, grayscale thresholding & masking, `copyMakeBorder` + drawing primitives (circles, text) | ✅ Complete |
 | 1 | [`assignment2/`](assignment2/) | Denoising, Convolution Theory, Integral Images, Histogram Equalization | Image denoising (Gaussian/median/bilateral filters, from-scratch vs. `cv2`, PSNR-based parameter optimization), Gaussian convolution theory, integral images for fast region sums (complexity analysis), histogram/CDF computation & histogram equalization from scratch | ✅ Complete |
+| 2 | [`assignment3/`](assignment3/) | Fourier Analysis, Image Pyramids, Canny Edge Detection, Chamfer Distance | Parseval's theorem proof, DFT magnitude/phase decomposition & reconstruction, spatial vs. frequency-domain filtering via the convolution theorem (`numpy.fft`), Gaussian/Laplacian pyramids & aliasing, from-scratch Canny edge detector (gradient, non-max suppression, hysteresis) vs. `cv2.Canny`, Chamfer 5-7-11 distance transform vs. `cv2.distanceTransform` | In progress |
 
 <!--
 When adding a new assignment:
@@ -45,6 +46,15 @@ When adding a new assignment:
 - **Convolution theory:** composability of Gaussian kernels, separable-filter cost analysis
 - **Histogram-based methods:** histogram/CDF estimation and histogram equalization implemented
   from scratch, validated against `cv2.equalizeHist`
+- **Frequency domain:** DFT magnitude/phase decomposition, Parseval's theorem, spatial vs.
+  frequency-domain filtering via the convolution theorem (`numpy.fft`, linear vs. circular
+  convolution)
+- **Multi-scale representations:** Gaussian/Laplacian image pyramids, aliasing from
+  downsampling without pre-filtering, coarse-to-fine reconstruction
+- **Edge & feature detection:** Canny edge detector built from scratch (gradient, non-maximum
+  suppression, hysteresis thresholding), evaluated against `cv2.Canny` via F1-score/MAD
+- **Shape matching primitives:** Chamfer 5-7-11 distance transform, directional Chamfer distance
+  between binary edge maps
 
 *(This list grows as later sheets are added — see the table above for the authoritative,
 per-sheet breakdown.)*
@@ -79,6 +89,15 @@ assignments/
 │   ├── bonn.jpg, bonn_noisy.jpg, bonn_lowcontrast.png  # sample images
 │   ├── answers.tex          # Q2 proof + all discussion sections (LaTeX source)
 │   └── answers.pdf           # compiled written answers (Q2 proof, 1.4/3.4/4.3/4.4 discussion)
+├── assignment3/            # Sheet 2 — Fourier Analysis, Pyramids, Canny, Chamfer Distance
+│   ├── CV1_sheet_2.pdf      # original exercise sheet
+│   ├── template1.tex        # Q1: Parseval's theorem proof
+│   ├── template2.py         # Q2: Fourier magnitude/phase, spatial vs. frequency filtering
+│   ├── template3.py         # Q3: Gaussian & Laplacian pyramids
+│   ├── template4.py         # Q4: Canny edge detector from scratch
+│   ├── template5.py         # Q5: Chamfer 5-7-11 distance transform
+│   ├── data/                 # sample images (1.png, 2.png, kitty.png, uni-bonn.jpg, chequerboard.jpg, stripes.png)
+│   └── README.md             # group members for this sheet
 └── assignmentN/             # future sheets, added as the semester progresses
 ```
 
@@ -103,15 +122,17 @@ Each assignment folder is self-contained. With the venv above activated, from in
 ```bash
 python Sheet00_template.py     # assignment1
 python q1_template.py          # assignment2, Question 1 (also q3_template.py, q4_template.py)
+python template2.py            # assignment3, Question 2 (also template3/4/5.py)
 ```
 
-Sheets with theory/discussion questions (e.g. Sheet 1's Question 2 proof) are written up separately
-as LaTeX, compiled with a local TeX distribution (not part of the Python venv):
+Sheets with theory/discussion questions (e.g. Sheet 1's Question 2 proof, Sheet 2's Question 1
+Parseval's theorem proof) are written up separately as LaTeX, compiled with a local TeX
+distribution (not part of the Python venv):
 
 ```bash
-cd assignment2
-pdflatex answers.tex
-rm -f answers.aux answers.log answers.out   # drop build artifacts, keep .tex and .pdf
+cd assignment2 && pdflatex answers.tex     # Sheet 1 write-up
+cd assignment3 && pdflatex template1.tex   # Sheet 2, Question 1 proof
+rm -f *.aux *.log *.out   # drop build artifacts, keep .tex and .pdf
 ```
 
 ## Academic Integrity

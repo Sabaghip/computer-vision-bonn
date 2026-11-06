@@ -1,0 +1,29 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage[margin=2.5cm]{geometry}
+
+\begin{document}
+
+\section*{Exercise 1: Parseval's Theorem (2 points)}
+
+For the unitary DFT,
+\[
+F(\omega_k)=\frac{1}{\sqrt{N}}\sum_{x=0}^{N-1}f(x)e^{-i\omega_kx},
+\qquad \omega_k=\frac{2\pi k}{N},
+\]
+prove that
+\[
+\sum_{x=0}^{N-1}|f(x)|^2=\sum_{k=0}^{N-1}|F(\omega_k)|^2.
+\]
+
+\noindent\textit{Hint:} Recall that $|z|^2=z\overline{z}$ and that
+$\sum_{k=0}^{N-1}r^k=(1-r^N)/(1-r)$ for $r\neq 1$.
+
+\subsection*{Your proof}
+
+% TODO: Expand the squared magnitude of each Fourier coefficient.
+% TODO: Rearrange the sums and use orthogonality of complex exponentials.
+% TODO: Explain the orthogonality identity and obtain the result.
+    
+\end{document}
