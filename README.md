@@ -91,12 +91,16 @@ assignments/
 │   └── answers.pdf           # compiled written answers (Q2 proof, 1.4/3.4/4.3/4.4 discussion)
 ├── assignment3/            # Sheet 2 — Fourier Analysis, Pyramids, Canny, Chamfer Distance
 │   ├── CV1_sheet_2.pdf      # original exercise sheet
-│   ├── template1.tex        # Q1: Parseval's theorem proof
+│   ├── template1.tex        # Q1: Parseval's theorem proof (source)
+│   ├── template1.pdf         # Q1: compiled proof
 │   ├── template2.py         # Q2: Fourier magnitude/phase, spatial vs. frequency filtering
 │   ├── template3.py         # Q3: Gaussian & Laplacian pyramids
 │   ├── template4.py         # Q4: Canny edge detector from scratch
 │   ├── template5.py         # Q5: Chamfer 5-7-11 distance transform
+│   ├── report.tex           # discussion/explanation sections for Q2-Q5 (LaTeX source)
+│   ├── report.pdf            # compiled report (Q1 proof is separate: template1.pdf)
 │   ├── data/                 # sample images (1.png, 2.png, kitty.png, uni-bonn.jpg, chequerboard.jpg, stripes.png)
+│   ├── results/               # figures saved by each template script (per-exercise subfolders)
 │   └── README.md             # group members for this sheet
 └── assignmentN/             # future sheets, added as the semester progresses
 ```
@@ -132,6 +136,7 @@ distribution (not part of the Python venv):
 ```bash
 cd assignment2 && pdflatex answers.tex     # Sheet 1 write-up
 cd assignment3 && pdflatex template1.tex   # Sheet 2, Question 1 proof
+cd assignment3 && pdflatex report.tex      # Sheet 2, Questions 2-5 discussion sections
 rm -f *.aux *.log *.out   # drop build artifacts, keep .tex and .pdf
 ```
 

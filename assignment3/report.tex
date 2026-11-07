@@ -1,0 +1,153 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{parskip}
+
+\title{MA-INF 2201 Computer Vision WS26/27 \\ Exercise Sheet 2 --- Report / Discussion Sections}
+\author{Mohamadhosein Sabaghi \and Sepehr Noey Kordkandi}
+\date{}
+
+\begin{document}
+\maketitle
+
+\noindent\textit{Note: the Parseval's theorem proof (Question 1) is submitted separately as
+\texttt{template1.pdf}. This report covers the discussion/explanation prompts from Questions
+2--5.}
+
+% ==========================================================================
+\section{Fourier Transform and Spatial vs.\ Frequency Filtering}
+
+\subsection{Magnitude and Phase (Part 2a)}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+Reconstruction & MAD vs.\ Image 1 & MAD vs.\ Image 2 \\
+\midrule
+Magnitude(1) + Phase(2) & $61.29$ & $\mathbf{37.06}$ \\
+Magnitude(2) + Phase(1) & $\mathbf{35.63}$ & $50.04$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In both cases, the reconstruction is closer (lower MAD, bold) to whichever original image
+supplied its \emph{phase}, not whichever supplied its magnitude: ``Magnitude(1)+Phase(2)''
+resembles Image 2 more ($37.06 < 61.29$), and ``Magnitude(2)+Phase(1)'' resembles Image 1
+more ($35.63 < 50.04$). This confirms the classical result that \textbf{phase}, not
+magnitude, carries the recognisable spatial structure of an image --- the magnitude
+spectrum mainly encodes overall contrast/texture energy per frequency, while the phase
+encodes \emph{where} those frequency components align in the image, which is what the
+visual system (and pixel-wise comparison) primarily responds to.
+
+MAD does capture this effect in the correct direction, but only partially: the gap between
+the two MAD values for each reconstruction ($61.29$ vs.\ $37.06$, and $35.63$ vs.\ $50.04$)
+is modest relative to the overall magnitude of both numbers (out of a $0$--$255$ intensity
+range), even though the phase-matched image is typically much more clearly recognisable by
+eye than this gap alone would suggest. This is consistent with MAD being a purely
+pixel-wise error metric that does not model perceptual/structural similarity --- it reacts
+to the right component being present, but understates how large the subjective difference
+in recognisability actually is.
+
+\subsection{Spatial vs.\ Frequency Domain Filtering (Part 2b)}
+
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+Filter & MAD (spatial vs.\ frequency domain) \\
+\midrule
+Box ($9\times9$) & $3.52\times10^{-14}$ \\
+Gaussian ($9\times9$, $\sigma=1.5$) & $2.64\times10^{-14}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Both values are many orders of magnitude below the required threshold of $10^{-7}$, at the
+level of floating-point round-off rather than any real discrepancy. This confirms that the
+frequency-domain implementation correctly performs \emph{linear} convolution (via explicit
+zero-padding to the full convolution size before multiplying spectra, then cropping back to
+the original image size) rather than circular convolution, matching the direct spatial-domain
+sliding-window convolution to numerical precision.
+
+% ==========================================================================
+\section{Gaussian and Laplacian Pyramids}
+
+\subsection{Gaussian Pyramid and Aliasing (Part 3a)}
+
+Gaussian filter and settings used: $5\times5$ kernel, $\sigma=1.0$, reflect boundary padding.
+Downsampling: decimation by 2 (keep every other row/column).
+
+Downsampling by a factor of 2 halves the sampling rate, which also halves the Nyquist
+frequency the result can represent. A high-frequency synthetic pattern (checkerboard /
+stripes) contains energy above this new Nyquist limit. Without pre-filtering, that excess
+high-frequency content does not simply disappear --- it folds back (\emph{aliases}) into
+lower frequencies, producing a distorted or moir\'e-like pattern rather than a faithfully
+shrunk version of the original. Pre-filtering with a Gaussian low-pass suppresses frequency
+content above the new Nyquist limit before the samples are discarded, so the filtered
+pyramid shows a clean, correctly-shrunk pattern at every level. The natural image
+(\texttt{kitty.png}), having comparatively little very-high-frequency content, shows the
+same effect much more subtly, mainly as slightly softer edges in the filtered pyramid
+versus marginally jagged edges in the unfiltered one.
+% TODO: adjust/extend this paragraph once you've visually compared the saved
+% gaussian_pyramid_kitty.png and gaussian_pyramid_pattern.png figures.
+
+\subsection{Laplacian Pyramid and Reconstruction (Part 3b)}
+
+Settings used for decomposition and reconstruction (identical in both directions, as
+required): Gaussian filter $5\times5$, $\sigma=1.0$, reflect boundary padding; expand
+operation via \texttt{cv2.resize} with bilinear interpolation (\texttt{cv2.INTER\_LINEAR}),
+resizing directly to each target level's exact shape. No clipping or quantisation was
+applied to any intermediate image.
+
+\begin{center}
+\textbf{Reconstruction MAD: $2.08 \times 10^{-19}$}
+\end{center}
+
+This is effectively zero (floating-point noise level), confirming that expanding and
+summing the Laplacian levels from coarse to fine exactly reconstructs the original image,
+as expected from the telescoping definition $L_\ell = G_\ell - \text{expand}(G_{\ell+1})$.
+
+% ==========================================================================
+\section{Canny Edge Detector}
+% TODO: fill in once template4.py has been run.
+% - State the thresholds and other parameters used for both your implementation
+%   and cv2.Canny (must use the same preprocessed input / compatible settings).
+% - Report the F1-score and MAD between the two binary edge maps
+%   (target: MAD <= 0.07, F1-score >= 0.6).
+
+TODO: write this section.
+
+% ==========================================================================
+\section{Chamfer Distance}
+
+\subsection{Chamfer 5-7-11 Distance Transform (Part 5a)}
+% TODO: fill in once template5.py has been run.
+% Briefly explain why the difference vs. cv2.distanceTransform (Euclidean) is
+% not identically zero: the chamfer 5-7-11 transform only approximates
+% Euclidean distance using integer step costs along a small set of discrete
+% directions (axis, diagonal, knight-move offsets), so for longer paths the
+% accumulated approximation error means it is not exactly proportional to
+% true Euclidean distance everywhere.
+
+TODO: write this section.
+
+\subsection{Chamfer Distance Between Two Fixed Edge Maps (Part 5b)}
+% TODO: fill in once template5.py has been run --- report d_ch(A,B) and d_ch(B,A).
+
+The two directional Chamfer distances $d_{\text{ch}}(A,B)$ and $d_{\text{ch}}(B,A)$ need not
+be equal because each one averages, over a different point set ($A$ or $B$), the distance to
+the \emph{other} set's nearest point --- and these are generally different quantities. In
+particular, since $B$ is constructed to contain every point of $A$ plus at least one extra
+point, every point of $A$ has distance $0$ to its nearest neighbour in $B$ (because that
+neighbour can always be the corresponding point of $A$ itself, which is also in $B$), giving
+$d_{\text{ch}}(A,B) = 0$. The reverse direction, $d_{\text{ch}}(B,A)$, includes the extra
+point(s) in $B$ that are not in $A$; those contribute a strictly positive distance to their
+nearest neighbour in $A$, so $d_{\text{ch}}(B,A) > 0$. This asymmetry is exactly why Chamfer
+distance is a one-sided (directional) similarity measure rather than a true metric distance
+between sets.
+
+TODO: report the two actual numerical values once computed.
+
+\end{document}
