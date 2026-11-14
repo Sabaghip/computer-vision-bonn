@@ -1,0 +1,113 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{parskip}
+
+\title{MA-INF 2201 Computer Vision WS26/27 \\ Exercise Sheet 3 --- Written Answers}
+\author{Mohamadhosein Sabaghi \and Sepehr Noey Kordkandi}
+\date{}
+
+\begin{document}
+\maketitle
+
+% ==========================================================================
+\section{Hough Transform for Line Detection}
+
+Edge points used: the 5 bright pixels of \texttt{control.png} at
+$(8,64), (64,8), (64,64), (64,120), (120,64)$ --- a plus-sign arrangement with an
+obvious horizontal line through $(8,64),(64,64),(120,64)$ and an obvious vertical
+line through $(64,8),(64,64),(64,120)$.
+
+\subsection{Why the Hough Space Looks Like Sine Waves}
+
+For a fixed point $(x,y)$, the normal-form line equation gives
+\[
+\rho(\theta) = x\cos\theta + y\sin\theta.
+\]
+This is exactly the trigonometric identity $a\cos\theta + b\sin\theta = R\cos(\theta-\varphi)$
+with $R=\sqrt{x^2+y^2}$ and $\varphi=\operatorname{atan2}(y,x)$ --- i.e.\ a sinusoid in
+$\theta$ with amplitude equal to the point's distance from the origin and a phase shift
+equal to the point's angular position. Every point in the image therefore traces out one
+sine curve in $(\theta,\rho)$ space, and points that are collinear in the image produce
+curves that all cross at the same $(\theta,\rho)$ --- that crossing is exactly the line's
+own normal-form parameters, which is why the accumulator bin there collects one vote per
+point on the line.
+
+\subsection{Can the Accumulator Have a Straight Horizontal Line?}
+
+Yes. A horizontal line in Hough space means $\rho$ stays constant while $\theta$ varies
+over the full range, i.e.\ $x\cos\theta + y\sin\theta$ is the same value for every $\theta$.
+Since $\cos\theta$ and $\sin\theta$ vary independently as $\theta$ sweeps its range, the only
+way their weighted sum can be constant for all $\theta$ is if $x=0$ and $y=0$: that is, a point
+located exactly at the origin $(0,0)$ produces a flat line $\rho(\theta)=0$ for every $\theta$.
+None of the 5 points in \texttt{control.png} sit at the origin (the origin is the image's
+top-left corner), so no such horizontal line appears in our accumulator --- all 5 points lie
+strictly inside the image, away from $(0,0)$.
+
+\subsection{$\theta\in[0^\circ,360^\circ)$ and Multiple Representations}
+
+With the default range $\theta\in[50^\circ,270^\circ]$, thresholding the accumulator at
+$\geq 3$ votes already gives \textbf{three} detected lines, not two:
+
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+$\theta$ & $\rho$ & votes \\
+\midrule
+$90^\circ$ & $64$ & 3 \\
+$270^\circ$ & $-64$ & 3 \\
+$180^\circ$ & $-64$ & 3 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Checking what these actually correspond to: $(\theta,\rho)=(90^\circ,64)$ gives
+$0\cdot x + 1\cdot y = 64$, i.e.\ the line $y=64$; $(\theta,\rho)=(270^\circ,-64)$ gives
+$0\cdot x + (-1)\cdot y = -64$, which is \emph{also} $y=64$ --- the same horizontal line, in
+its second valid parametrization. $(\theta,\rho)=(180^\circ,-64)$ gives $-1\cdot x = -64$,
+i.e.\ $x=64$, the vertical line.
+
+Every line has exactly two equivalent normal-form representations, $(\theta,\rho)$ and
+$(\theta+180^\circ,-\rho)$, since reversing the normal direction and negating the signed
+distance describes the same geometric line. The default range already spans $220^\circ$
+(more than the $180^\circ$ needed for a unique representation), so it happens to capture
+\emph{both} representations of the horizontal line ($90^\circ$ and $270^\circ$ are
+$180^\circ$ apart and both lie in $[50^\circ,270^\circ]$), while only capturing one
+representation of the vertical line (its other form, $(0^\circ,64)$, falls just outside the
+range since $\mathrm{THETA\_MIN}=50^\circ$).
+
+Extending the range to the full $[0^\circ,360^\circ)$ brings every line's \emph{second}
+representation into range as well --- here, specifically $(\theta,\rho)=(0^\circ,64)$ for
+the vertical line. So instead of finding 2 physical lines, we expect to detect
+\textbf{4} accumulator peaks for the same 2 lines: this is why there end up being more than
+two representations overall once the range exceeds $180^\circ$ --- each physical line
+contributes one extra, numerically distinct but geometrically identical, peak for every
+full $180^\circ$ of extra range covered.
+% TODO: confirm this matches the actual printed output after rerunning q1_template.py
+% with THETA_MIN=0, THETA_MAX=360, and adjust the exact count/values if needed.
+
+% ==========================================================================
+\section{Roll Correction with Hough Transform}
+% TODO: fill in once q2_template.py has been run.
+% - Visualise/describe the Canny edges, top-10 detected lines, and the unrolled image.
+% - Explain how adding more lines affects the correction angle (e.g. averaging
+%   more line-angle estimates reduces sensitivity to any single noisy/outlier
+%   detected line, but may also pull in lines that are not aligned with the
+%   dominant roll direction if the threshold is too permissive).
+
+TODO: write this section.
+
+% ==========================================================================
+\section{Hough Transform for Circle Detection}
+% TODO: fill in once q3_template.py has been run.
+% - Describe the detected circles overlaid on coins.jpg.
+% - Describe the accumulator slices at different radii and at the best radius.
+% - Comment on how results vary with threshold and radius range (e.g. too low
+%   a threshold gives false positives, too narrow a radius range misses coins
+%   of a different size, too high a threshold misses faint/partial circles).
+
+TODO: write this section.
+
+\end{document}
