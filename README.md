@@ -26,6 +26,7 @@ been implemented.
 | 0 | [`assignment1/`](assignment1/) | Introduction to OpenCV | Image I/O & display, RGB→HSV color space, pixel-wise transforms (loop vs. vectorized, with timing comparison), ROI patch extraction/placement, grayscale thresholding & masking, `copyMakeBorder` + drawing primitives (circles, text) | ✅ Complete |
 | 1 | [`assignment2/`](assignment2/) | Denoising, Convolution Theory, Integral Images, Histogram Equalization | Image denoising (Gaussian/median/bilateral filters, from-scratch vs. `cv2`, PSNR-based parameter optimization), Gaussian convolution theory, integral images for fast region sums (complexity analysis), histogram/CDF computation & histogram equalization from scratch | ✅ Complete |
 | 2 | [`assignment3/`](assignment3/) | Fourier Analysis, Image Pyramids, Canny Edge Detection, Chamfer Distance | Parseval's theorem proof, DFT magnitude/phase decomposition & reconstruction, spatial vs. frequency-domain filtering via the convolution theorem (`numpy.fft`), Gaussian/Laplacian pyramids & aliasing, from-scratch Canny edge detector (gradient, non-max suppression, hysteresis) vs. `cv2.Canny`, Chamfer 5-7-11 distance transform vs. `cv2.distanceTransform` | ✅ Complete |
+| 3 | [`assignment4/`](assignment4/) | Hough Transform for Lines and Circles | From-scratch Hough accumulator for line detection (normal/polar line representation, θ-range ambiguity), Hough-based roll correction via `cv2.Canny` + `cv2.getRotationMatrix2D`/`cv2.warpAffine`, Hough circle detection via a 3D (x, y, radius) accumulator | In progress |
 
 <!--
 When adding a new assignment:
@@ -55,6 +56,9 @@ When adding a new assignment:
   suppression, hysteresis thresholding), evaluated against `cv2.Canny` via F1-score/MAD
 - **Shape matching primitives:** Chamfer 5-7-11 distance transform, directional Chamfer distance
   between binary edge maps
+- **Hough transform / parametric shape detection:** line detection via a polar-coordinate
+  accumulator, roll/skew correction from detected lines, circle detection via a 3D
+  (center, radius) accumulator
 
 *(This list grows as later sheets are added — see the table above for the authoritative,
 per-sheet breakdown.)*
@@ -102,6 +106,12 @@ assignments/
 │   ├── data/                 # sample images (1.png, 2.png, kitty.png, uni-bonn.jpg, chequerboard.jpg, stripes.png)
 │   ├── results/               # figures saved by each template script (per-exercise subfolders)
 │   └── README.md             # group members for this sheet
+├── assignment4/            # Sheet 3 — Hough Transform for Lines and Circles
+│   ├── CV1_sheet_3.pdf      # original exercise sheet
+│   ├── q1_template.py       # Q1: Hough line accumulator + line detection
+│   ├── q2_template.py       # Q2: roll correction via Hough lines (imports q1_template)
+│   ├── q3_template.py       # Q3: Hough circle detection
+│   └── data/                 # sample images (control.png, parallel.jpg, coins.jpg)
 └── assignmentN/             # future sheets, added as the semester progresses
 ```
 
@@ -127,6 +137,7 @@ Each assignment folder is self-contained. With the venv above activated, from in
 python Sheet00_template.py     # assignment1
 python q1_template.py          # assignment2, Question 1 (also q3_template.py, q4_template.py)
 python template2.py            # assignment3, Question 2 (also template3/4/5.py)
+python q1_template.py          # assignment4, Question 1 (also q2_template.py, q3_template.py)
 ```
 
 Sheets with theory/discussion questions (e.g. Sheet 1's Question 2 proof, Sheet 2's Question 1
