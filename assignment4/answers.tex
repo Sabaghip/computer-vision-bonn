@@ -90,14 +90,52 @@ full $180^\circ$ of extra range covered.
 
 % ==========================================================================
 \section{Roll Correction with Hough Transform}
-% TODO: fill in once q2_template.py has been run.
-% - Visualise/describe the Canny edges, top-10 detected lines, and the unrolled image.
-% - Explain how adding more lines affects the correction angle (e.g. averaging
-%   more line-angle estimates reduces sensitivity to any single noisy/outlier
-%   detected line, but may also pull in lines that are not aligned with the
-%   dominant roll direction if the threshold is too permissive).
 
-TODO: write this section.
+Edges were detected on \texttt{parallel.jpg} with \texttt{cv2.Canny}, and the Hough
+accumulator restricted to $\theta\in[75^\circ,105^\circ]$ (near-horizontal lines only, since
+the roll is assumed to be within $15^\circ$). The top-10 distinct dominant lines found were:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+$\theta$ (deg) & $\rho$ (px) \\
+\midrule
+$101.00$ & $492.0$ \\
+$104.00$ & $387.0$ \\
+$101.00$ & $544.0$ \\
+$104.00$ & $365.0$ \\
+$104.00$ & $339.0$ \\
+$101.00$ & $410.0$ \\
+$101.00$ & $446.0$ \\
+$101.00$ & $900.0$ \\
+$101.00$ & $519.0$ \\
+$101.00$ & $475.0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\textbf{Correction angle: $11.90^\circ$}
+\end{center}
+
+Since $\theta=90^\circ$ corresponds to a perfectly horizontal line, the mean of the detected
+$\theta$ values directly gives the roll: the dominant near-horizontal structures (building
+rooflines/skyline) are tilted about $11.9^\circ$ from true horizontal, clustered almost
+entirely around $\theta=101^\circ$ and $104^\circ$ rather than scattered randomly, which is
+a good sign that these are genuine structural lines rather than noise. The correction angle
+is passed directly to \texttt{cv2.getRotationMatrix2D} (positive = counter-clockwise), and
+applying it with \texttt{cv2.warpAffine} visually straightens the skyline in the output
+image.
+
+% TODO: fill in once the top-k line count has actually been varied (e.g. k=3 vs 10 vs 30)
+% and the resulting correction_angle compared across runs:
+% How does adding more lines affect the correction angle? (e.g. averaging more
+% line-angle estimates reduces sensitivity to any single noisy/outlier detected
+% line, but may also pull in lines that are not aligned with the dominant roll
+% direction if too many weaker, less relevant lines get included.)
+
+TODO: report the correction angle for a few different values of top-$k$ and discuss the
+trend once that comparison has been run.
 
 % ==========================================================================
 \section{Hough Transform for Circle Detection}
