@@ -157,13 +157,72 @@ the value given by the clearly dominant lines.
 
 % ==========================================================================
 \section{Hough Transform for Circle Detection}
-% TODO: fill in once q3_template.py has been run.
-% - Describe the detected circles overlaid on coins.jpg.
-% - Describe the accumulator slices at different radii and at the best radius.
-% - Comment on how results vary with threshold and radius range (e.g. too low
-%   a threshold gives false positives, too narrow a radius range misses coins
-%   of a different size, too high a threshold misses faint/partial circles).
 
-TODO: write this section.
+Edges were detected on \texttt{coins.jpg} with \texttt{cv2.Canny} after a $5\times5$
+Gaussian pre-blur ($\sigma=1.5$), yielding $4197$ edge pixels on a $417\times640$ image.
+The 3D accumulator was built over $r\in[15,70]$ (step $2$) and $\theta\in[0^\circ,360^\circ)$
+(step $5^\circ$). With the final parameters (threshold $=30$, min\_dist $=20$), all
+\textbf{10} coins visible in the image were detected, matching the coins exactly when the
+circles are overlaid on the original image:
+
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+Center $(a,b)$ & Radius & Votes \\
+\midrule
+$(280,147)$ & $31$ & $57$ \\
+$(174,176)$ & $51$ & $49$ \\
+$(98,290)$  & $31$ & $43$ \\
+$(512,173)$ & $45$ & $41$ \\
+$(399,222)$ & $45$ & $39$ \\
+$(284,303)$ & $49$ & $39$ \\
+$(259,54)$  & $41$ & $37$ \\
+$(218,319)$ & $37$ & $33$ \\
+$(412,346)$ & $41$ & $33$ \\
+$(396,94)$  & $49$ & $33$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The accumulator slices at different radii each show bright spots only at the centers of
+coins whose true size is close to that slice's radius --- e.g.\ the $r=31$ slice peaks
+sharply at $(280,147)$ and $(98,290)$ (the two mid-sized coins), while larger coins barely
+register there and instead peak at their own, larger-radius slices. The best overall slice
+is at $r=31$ (max votes $=57$), the single most clearly-defined circular edge in the image.
+
+\subsection*{Effect of Threshold and Radius Range}
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+Threshold & Detections \\
+\midrule
+$40$ & $4$ \\
+$35$ & $7$ \\
+$\mathbf{30}$ & $\mathbf{10}$ (matches all coins) \\
+$25$ & $11$ (one extra, much weaker candidate at votes$=25$) \\
+$20$ & $19$ (many small-radius false positives, votes $\leq 25$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+This sweep shows the threshold acting as a clean trade-off knob: too high (e.g.\ $80$, our
+initial guess) misses every circle, since even the strongest true coin edge only accumulates
+$57$ votes --- a real effect of angular discretization (with $\theta$ sampled every
+$5^\circ$, a true edge pixel's vote lands on a slightly different rounded pixel near the true
+center for radii in this range, spreading votes across a small neighbourhood rather than a
+single exact bin, so peak votes end up well below the raw edge-pixel count on each circle).
+Too low a threshold (e.g.\ $20$) instead admits many spurious small-radius detections from
+non-circular structure (coin surface patterns, lighting artefacts) that happen to
+accumulate a handful of coincidental votes. The chosen threshold of $30$ sits exactly in the
+gap between the 10 genuine coin peaks (votes $33$--$57$) and the next, clearly weaker
+candidate (votes $25$), which is why it reproduces the true coin count exactly.
+
+The radius range $[15,70]$ was chosen generously around the visibly varying coin sizes in
+the image; narrowing it (e.g.\ excluding $r>51$) would have missed nothing here since no
+detected coin exceeds radius $51$, but on an image with a wider range of object sizes, too
+narrow a range would systematically miss the smallest or largest circles, while an
+unnecessarily wide range only costs extra computation (one more accumulator slice per extra
+radius step) without changing the result.
 
 \end{document}
