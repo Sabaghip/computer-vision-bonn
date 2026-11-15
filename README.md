@@ -26,7 +26,7 @@ been implemented.
 | 0 | [`assignment1/`](assignment1/) | Introduction to OpenCV | Image I/O & display, RGB→HSV color space, pixel-wise transforms (loop vs. vectorized, with timing comparison), ROI patch extraction/placement, grayscale thresholding & masking, `copyMakeBorder` + drawing primitives (circles, text) | ✅ Complete |
 | 1 | [`assignment2/`](assignment2/) | Denoising, Convolution Theory, Integral Images, Histogram Equalization | Image denoising (Gaussian/median/bilateral filters, from-scratch vs. `cv2`, PSNR-based parameter optimization), Gaussian convolution theory, integral images for fast region sums (complexity analysis), histogram/CDF computation & histogram equalization from scratch | ✅ Complete |
 | 2 | [`assignment3/`](assignment3/) | Fourier Analysis, Image Pyramids, Canny Edge Detection, Chamfer Distance | Parseval's theorem proof, DFT magnitude/phase decomposition & reconstruction, spatial vs. frequency-domain filtering via the convolution theorem (`numpy.fft`), Gaussian/Laplacian pyramids & aliasing, from-scratch Canny edge detector (gradient, non-max suppression, hysteresis) vs. `cv2.Canny`, Chamfer 5-7-11 distance transform vs. `cv2.distanceTransform` | ✅ Complete |
-| 3 | [`assignment4/`](assignment4/) | Hough Transform for Lines and Circles | From-scratch Hough accumulator for line detection (normal/polar line representation, θ-range ambiguity), Hough-based roll correction via `cv2.Canny` + `cv2.getRotationMatrix2D`/`cv2.warpAffine`, Hough circle detection via a 3D (x, y, radius) accumulator | In progress |
+| 3 | [`assignment4/`](assignment4/) | Hough Transform for Lines and Circles | From-scratch Hough accumulator for line detection (normal/polar line representation, θ-range ambiguity), Hough-based roll correction via `cv2.Canny` + `cv2.getRotationMatrix2D`/`cv2.warpAffine`, Hough circle detection via a 3D (x, y, radius) accumulator | ✅ Complete |
 
 <!--
 When adding a new assignment:
@@ -111,6 +111,8 @@ assignments/
 │   ├── q1_template.py       # Q1: Hough line accumulator + line detection
 │   ├── q2_template.py       # Q2: roll correction via Hough lines (imports q1_template)
 │   ├── q3_template.py       # Q3: Hough circle detection
+│   ├── answers.tex           # written explanations for Q1-Q3 (LaTeX source)
+│   ├── answers.pdf            # compiled written answers
 │   └── data/                 # sample images (control.png, parallel.jpg, coins.jpg)
 └── assignmentN/             # future sheets, added as the semester progresses
 ```
@@ -148,6 +150,7 @@ distribution (not part of the Python venv):
 cd assignment2 && pdflatex answers.tex     # Sheet 1 write-up
 cd assignment3 && pdflatex template1.tex   # Sheet 2, Question 1 proof
 cd assignment3 && pdflatex report.tex      # Sheet 2, Questions 2-5 discussion sections
+cd assignment4 && pdflatex answers.tex     # Sheet 3 write-up (Questions 1-3)
 rm -f *.aux *.log *.out   # drop build artifacts, keep .tex and .pdf
 ```
 
