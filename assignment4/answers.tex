@@ -127,15 +127,33 @@ is passed directly to \texttt{cv2.getRotationMatrix2D} (positive = counter-clock
 applying it with \texttt{cv2.warpAffine} visually straightens the skyline in the output
 image.
 
-% TODO: fill in once the top-k line count has actually been varied (e.g. k=3 vs 10 vs 30)
-% and the resulting correction_angle compared across runs:
-% How does adding more lines affect the correction angle? (e.g. averaging more
-% line-angle estimates reduces sensitivity to any single noisy/outlier detected
-% line, but may also pull in lines that are not aligned with the dominant roll
-% direction if too many weaker, less relevant lines get included.)
+\subsection*{Effect of the Number of Lines on the Correction Angle}
 
-TODO: report the correction angle for a few different values of top-$k$ and discuss the
-trend once that comparison has been run.
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+top-$k$ & Correction angle \\
+\midrule
+3  & $12.00^\circ$ \\
+7  & $12.29^\circ$ \\
+10 & $11.90^\circ$ \\
+15 & $11.80^\circ$ \\
+30 & $10.97^\circ$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+For small to moderate $k$ ($3$--$15$), the correction angle stays tightly clustered around
+$11.8^\circ$--$12.3^\circ$, since these top lines are almost entirely at $\theta=101^\circ$
+or $104^\circ$ --- a small, consistent set of strong, genuine structural edges (rooflines
+along the skyline). At $k=30$, several additional lines at lower angles
+($\theta=97^\circ$--$100^\circ$) enter the average, pulling the correction angle down to
+$10.97^\circ$. This matches the expected trade-off: averaging over a moderate number of the
+\emph{strongest} lines is robust, since it smooths out small per-line discretization noise
+without diluting the estimate; but once $k$ grows large enough to include weaker,
+less-confident detections, those lines --- which may correspond to less reliable or
+less-representative edges --- begin to measurably shift the estimated roll angle away from
+the value given by the clearly dominant lines.
 
 % ==========================================================================
 \section{Hough Transform for Circle Detection}
