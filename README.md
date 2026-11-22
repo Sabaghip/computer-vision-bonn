@@ -27,6 +27,7 @@ been implemented.
 | 1 | [`assignment2/`](assignment2/) | Denoising, Convolution Theory, Integral Images, Histogram Equalization | Image denoising (Gaussian/median/bilateral filters, from-scratch vs. `cv2`, PSNR-based parameter optimization), Gaussian convolution theory, integral images for fast region sums (complexity analysis), histogram/CDF computation & histogram equalization from scratch | ✅ Complete |
 | 2 | [`assignment3/`](assignment3/) | Fourier Analysis, Image Pyramids, Canny Edge Detection, Chamfer Distance | Parseval's theorem proof, DFT magnitude/phase decomposition & reconstruction, spatial vs. frequency-domain filtering via the convolution theorem (`numpy.fft`), Gaussian/Laplacian pyramids & aliasing, from-scratch Canny edge detector (gradient, non-max suppression, hysteresis) vs. `cv2.Canny`, Chamfer 5-7-11 distance transform vs. `cv2.distanceTransform` | ✅ Complete |
 | 3 | [`assignment4/`](assignment4/) | Hough Transform for Lines and Circles | From-scratch Hough accumulator for line detection (normal/polar line representation, θ-range ambiguity), Hough-based roll correction via `cv2.Canny` + `cv2.getRotationMatrix2D`/`cv2.warpAffine`, Hough circle detection via a 3D (x, y, radius) accumulator | ✅ Complete |
+| 4 | [`assignment5/`](assignment5/) | Clustering: k-means and Spectral Clustering | Proof of k-means convergence, from-scratch k-means for texture segmentation (texton filter-bank histograms, mean-IoU scoring), from-scratch spectral clustering via the normalized-cut Laplacian (`np.linalg.eigh`, similarity graphs, circles/moons datasets) | In progress |
 
 <!--
 When adding a new assignment:
@@ -59,6 +60,9 @@ When adding a new assignment:
 - **Hough transform / parametric shape detection:** line detection via a polar-coordinate
   accumulator, roll/skew correction from detected lines, circle detection via a 3D
   (center, radius) accumulator
+- **Clustering / unsupervised segmentation:** k-means (convergence proof, from-scratch
+  implementation, multi-restart best-of-N), texton-histogram texture features, spectral
+  clustering via the normalized-cut graph Laplacian
 
 *(This list grows as later sheets are added — see the table above for the authoritative,
 per-sheet breakdown.)*
@@ -66,12 +70,14 @@ per-sheet breakdown.)*
 ## Tech Stack
 
 - **Language:** Python 3.12
-- **Core libraries:** OpenCV 5.0.0, NumPy 2.3.3, matplotlib, scikit-image
+- **Core libraries:** OpenCV 5.0.0, NumPy 2.3.3, matplotlib, scikit-image, SciPy
 - **Platform:** Linux
 - Each sheet restricts usage to only the packages listed in its own template. `requirements.txt`
   is the union of everything used across sheets so far — an individual sheet may only use a
   subset of it (e.g. Sheet 0 only needs OpenCV + NumPy; `scikit-image` is used solely for PSNR
-  in Sheet 1).
+  in Sheet 1). Sheet 4 is a notable exception: it's NumPy/SciPy/Matplotlib only, with **no
+  OpenCV at all** (and recommends Python ≥3.9, looser than earlier sheets' strict 3.12 pin —
+  our shared venv's 3.12 still satisfies it).
 
 ## Repository Structure
 
@@ -114,6 +120,13 @@ assignments/
 │   ├── answers.tex           # written explanations for Q1-Q3 (LaTeX source)
 │   ├── answers.pdf            # compiled written answers
 │   └── data/                 # sample images (control.png, parallel.jpg, coins.jpg)
+├── assignment5/            # Sheet 4 — Clustering: k-means and Spectral Clustering
+│   ├── Sheet04.pdf          # original exercise sheet (Ex1 proof + Ex2/Ex3 code)
+│   └── code/                 # course-provided code folder (run scripts from here)
+│       ├── ex2_texture_kmeans.py    # Ex2: from-scratch k-means, texton histograms
+│       ├── ex3_spectral_clustering.py  # Ex3: spectral clustering (imports ex2's k-means)
+│       ├── requirements.txt           # course-provided (numpy/scipy/matplotlib only)
+│       └── data/                       # mosaic.npy, mosaic_labels.npy (texture task)
 └── assignmentN/             # future sheets, added as the semester progresses
 ```
 
@@ -128,7 +141,8 @@ pip install -r requirements.txt
 ```
 
 This installs `numpy==2.3.3` and `opencv-python==5.0.0.93` (matching OpenCV 5.0.0 / Python
-3.12, Sheet 0's strict requirement) plus `matplotlib` and `scikit-image` for later sheets.
+3.12, Sheet 0's strict requirement) plus `matplotlib`, `scikit-image`, and `scipy` for
+later sheets.
 
 ## Running the Code
 
@@ -140,6 +154,7 @@ python Sheet00_template.py     # assignment1
 python q1_template.py          # assignment2, Question 1 (also q3_template.py, q4_template.py)
 python template2.py            # assignment3, Question 2 (also template3/4/5.py)
 python q1_template.py          # assignment4, Question 1 (also q2_template.py, q3_template.py)
+cd assignment5/code && python ex2_texture_kmeans.py   # assignment5 (must run from code/; also ex3_spectral_clustering.py)
 ```
 
 Sheets with theory/discussion questions (e.g. Sheet 1's Question 2 proof, Sheet 2's Question 1
